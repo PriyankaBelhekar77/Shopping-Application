@@ -14,11 +14,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const RenderAddProduct = ({ storeData }) => {
+  const toggle = false;
   const classes = useStyles();
   const [open, setOpen] = useState(true);
+  const [error, setError] = useState({});
   const [dialogOpen, setDialogOpen] = useState(false);
   const { addProduct, productData, setProductData, setProductAdd, props } = storeData;
-  const toggle = false;
+
   const categories = [
     { value: `men's clothing`, label: `men's clothing` },
     { value: 'jewelery', label: 'jewelery' },
@@ -34,11 +36,26 @@ const RenderAddProduct = ({ storeData }) => {
     title: ''
   })
 
-  const handleCategoryChange = ({ target: { value } }) => setDemoProduct({ ...demoProduct, category: value });
-  const handleDescChange = ({ target: { value } }) => setDemoProduct({ ...demoProduct, description: value });
-  const handleImageChange = ({ target: { value } }) => setDemoProduct({ ...demoProduct, image: value });
-  const handlePriceChange = ({ target: { value } }) => setDemoProduct({ ...demoProduct, price: value });
-  const handleTitleChange = ({ target: { value } }) => setDemoProduct({ ...demoProduct, title: value });
+  const handleCategoryChange = ({ target: { value } }) => {
+    setDemoProduct({ ...demoProduct, category: value });
+    value && setError({ ...error, category: '' });
+  }
+  const handleDescChange = ({ target: { value } }) => {
+    setDemoProduct({ ...demoProduct, description: value });
+    value && setError({ ...error, description: '' });
+  }
+  const handleImageChange = ({ target: { value } }) => {
+    setDemoProduct({ ...demoProduct, image: value });
+    value && setError({ ...error, image: '' });
+  }
+  const handlePriceChange = ({ target: { value } }) => {
+    setDemoProduct({ ...demoProduct, price: value });
+    value && setError({ ...error, price: '' });
+  }
+  const handleTitleChange = ({ target: { value } }) => {
+    setDemoProduct({ ...demoProduct, title: value });
+    value && setError({ ...error, title: '' });
+  }
 
   const randomID = () => {
     const id = Math.floor(Math.random() * 1000);
@@ -48,10 +65,36 @@ const RenderAddProduct = ({ storeData }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setOpen(false);
-    setProductData([...productData, { ...demoProduct, id: randomID() }]);
-    setProductAdd(false);
-    setDialogOpen(true);
+    if (handleValidation()) {
+      return;
+    } else {
+      setOpen(false);
+      setProductData([...productData, { ...demoProduct, id: randomID() }]);
+      setProductAdd(false);
+      setDialogOpen(true);
+    }
+  }
+
+  const handleValidation = () => {
+    let validate = false;
+    const { category, description, image, price, title } = demoProduct;
+    if (category === '') {
+      validate = true;
+      setError({ ...error, category: 'Please enter valid category' });
+    } else if (description === '') {
+      validate = true;
+      setError({ ...error, description: 'Please enter valid description' });
+    } else if (image === '') {
+      validate = true;
+      setError({ ...error, image: 'Please enter valid image source' });
+    } else if (price === '' || price <= 0) {
+      validate = true;
+      setError({ ...error, price: 'Please enter valid price' });
+    } else if (title === '') {
+      validate = true;
+      setError({ ...error, title: 'Please enter valid title' });
+    }
+    return validate;
   }
 
   return (
@@ -72,6 +115,8 @@ const RenderAddProduct = ({ storeData }) => {
               label="category"
               value={demoProduct.category}
               onChange={handleCategoryChange}
+              error={error.category}
+              helperText={error.category ? error.category : ''}
               defaultValue={demoProduct.category}
             >
               {categories.map((option) => (
@@ -83,15 +128,19 @@ const RenderAddProduct = ({ storeData }) => {
             <TextField
               id='standard-desc'
               label='description'
-              onChange={handleDescChange}
               multiline
               rows={1}
+              onChange={handleDescChange}
+              error={error.description}
+              helperText={error.description ? error.description : ''}
               defaultValue={demoProduct.description}
             />
             <TextField
               id='standard-image'
               label='image'
               onChange={handleImageChange}
+              error={error.image}
+              helperText={error.image ? error.image : ''}
               defaultValue={demoProduct.image}
             />
             <TextField
@@ -99,14 +148,16 @@ const RenderAddProduct = ({ storeData }) => {
               label='price'
               type='number'
               onChange={handlePriceChange}
-              error={demoProduct.price <= 0 || demoProduct.price === ''}
-              helperText={'Please enter valid price'}
+              error={error.price}
+              helperText={error.price ? error.price : ''}
               defaultValue={demoProduct.price}
             />
             <TextField
               id='standard-title'
               label='title'
               onChange={handleTitleChange}
+              error={error.title}
+              helperText={error.title ? error.title : ''}
               defaultValue={demoProduct.title}
             />
             <div className='btn-container' style={{ display: 'block' }}>
