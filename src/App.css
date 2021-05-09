@@ -114,8 +114,7 @@ ul {
   overflow: hidden;
 }
 
-@media screen and (min-width: 480px) {
-  .navbar {
-    padding: 0.7rem 2rem;
-  }
-}
+h1,
+h2 {
+  padding-left: 1rem;
+}  
